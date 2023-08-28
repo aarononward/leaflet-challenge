@@ -6,9 +6,7 @@ let streetmap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         "Street Map": streetmap
     };
 
-    let layers = {
-        Earthquakes : new L.LayerGroup()
-    };
+    Earthquakes = new L.LayerGroup()
 
     
     let map = L.map("map", {
@@ -16,13 +14,13 @@ let streetmap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
             37.09, -95.71
         ],
         zoom: 5,
-        layers: [layers.Earthquakes]
+        layers: [Earthquakes]
     });
 
     streetmap.addTo(map);
 
     let overlays = {
-        "Earthquakes": layers.Earthquakes
+        "Earthquakes": Earthquakes
     };
 
     L.control.layers(null, overlays).addTo(map);
@@ -112,48 +110,48 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geo
             L.circle([latitude,longitude], {
                 color: "green",
                 fillOpacity : 0.5,
-                radius: (magnitude*100)
-            }).addTo(layers[Earthquakes]);
+                radius: (magnitude*50000)
+            }).addTo(map);
         }
         else if (depth < 30) {
             depthRange = "10-30",
             L.circle([latitude,longitude], {
-                color: "yellow-green",
+                color: "yellow",
                 fillOpacity : 0.5,
-                radius: (magnitude*100)
-            }).addTo(layers[Earthquakes]);
+                radius: (magnitude*50000)
+            }).addTo(map);
         }
         else if (depth < 50) {
             depthRange = "30-50",
             L.circle([latitude,longitude], {
-                color: "yellow",
+                color: "orange",
                 fillOpacity : 0.5,
-                radius: (magnitude*100)
-            }).addTo(layers[Earthquakes]);
+                radius: (magnitude*50000)
+            }).addTo(map);
         }
         else if (depth < 70) {
             depthRange = "50-70",
             L.circle([latitude,longitude], {
-                color: "orange",
+                color: "lightred",
                 fillOpacity : 0.5,
-                radius: (magnitude*100)
-            }).addTo(layers[Earthquakes]);
+                radius: (magnitude*50000)
+            }).addTo(map);
         }
         else if (depth < 90) {
             depthRange = "70-90",
             L.circle([latitude,longitude], {
-                color: "red-orange",
+                color: "red",
                 fillOpacity : 0.5,
-                radius: (magnitude*100)
-            }).addTo(layers[Earthquakes]);
+                radius: (magnitude*50000)
+            }).addTo(map);
         }
         else if (depth > 90) {
             depthRange = "90+",
             L.circle([latitude,longitude], {
-            color: "red",
+            color: "darkred",
             fillOpacity : 0.5,
-            radius: (magnitude*100)
-            }).addTo(layers[Earthquakes]);
+            radius: (magnitude*50000)
+            }).addTo(map);
         }
     };
         
