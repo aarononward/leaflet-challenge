@@ -23,17 +23,37 @@ let streetmap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         "Earthquakes": Earthquakes
     };
 
-    L.control.layers(null, overlays).addTo(map);
+    function getColor(depths) {
+        return  depths < 10 ? "#11b556" :
+                depths < 30 ? "#b3ff00" :
+                depths < 50 ? "#f1ff33" :
+                depths < 70 ? "#cda102" :                
+                depths < 90 ? "#FF3300" :
+                "#990000"; 
+    }
+   L.control.layers(null,overlays, { 
+    collapsed:false
+   }).addTo(map)
 
     let info=L.control({
         position: "bottomright"
     });
 
+
     info.onAdd =function() {
-        let div = L.DomUtil.create("div", "legend");
+        let div = L.DomUtil.create("div", "legend"),
+        depths = [0,10,30,50,70,90],
+        labels = [];
+
+        for (let i = 0; i<depths.length; i++) {
+            div.innerHTML +=
+            '<i style="background:' + getColor(depths[i] + 1) + '"></i>' + 
+            depths[i] + (depths[i + 1] ? '&ndash;' + depths[i+1] +'<br>': '+');
+        }
         return div;
     }
     info.addTo(map)
+
 
 d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geojson").then(function(earthquakeData) {
     let earthquakes = earthquakeData.features
@@ -41,6 +61,8 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geo
     let depthRange
     for (let i=0; i<  earthquakes.length; i++){    
         let earthquake= earthquakes[i]
+        let title = earthquake.properties.title
+        let date = Date(earthquake.properties.time)
         let coordinates = earthquake.geometry.coordinates
         let latitude = coordinates[1]
         let longitude = coordinates[0]
@@ -49,42 +71,50 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geo
         if (depth < 10) {
             depthRange = "<10",
             L.circle([latitude,longitude], {
-                color: "#00CC00",
+                color: "#11b556",
                 fillOpacity : 0.5,
                 radius: (magnitude*50000)
-            }).bindPopup(`<h3>Location : [${latitude} ,  ${longitude}]</h3><hr> 
+            }).bindPopup(`<h3>${title}</h3><hr>
+            <p>Date: ${date}</p><hr>
+            <p>Location : [${latitude} ,  ${longitude}]</p><hr> 
             <p>Magnitude : ${magnitude}</p><hr>
-            <p>Depth: ${depth}</p>`).addTo(map);
+            <p>Depth: ${depth}</p><hr>`).addTo(map);
         }
         else if (depth < 30) {
             depthRange = "10-30",
             L.circle([latitude,longitude], {
-                color: "#FFFF33",
+                color: "#b3ff00",
                 fillOpacity : 0.5,
                 radius: (magnitude*50000)
-            }).bindPopup(`<h3>Location : [${latitude} ,  ${longitude}]</h3><hr> 
+            }).bindPopup(`<h3>${title}</h3><hr>
+            <p>Date: ${date}</p><hr>
+            <p>Location : [${latitude} ,  ${longitude}]</p><hr> 
             <p>Magnitude : ${magnitude}</p><hr>
-            <p>Depth: ${depth}</p>`).addTo(map);
+            <p>Depth: ${depth}</p><hr>`).addTo(map);
         }
         else if (depth < 50) {
             depthRange = "30-50",
             L.circle([latitude,longitude], {
-                color: "#FFC300",
+                color: "#f1ff33",
                 fillOpacity : 0.5,
                 radius: (magnitude*50000)
-            }).bindPopup(`<h3>Location : [${latitude} ,  ${longitude}]</h3><hr> 
+            }).bindPopup(`<h3>${title}</h3><hr>
+            <p>Date: ${date}</p><hr>
+            <p>Location : [${latitude} ,  ${longitude}]</p><hr> 
             <p>Magnitude : ${magnitude}</p><hr>
-            <p>Depth: ${depth}</p>`).addTo(map);
+            <p>Depth: ${depth}</p><hr>`).addTo(map);
         }
         else if (depth < 70) {
             depthRange = "50-70",
             L.circle([latitude,longitude], {
-                color: "#FF5733",
+                color: "#cda102",
                 fillOpacity : 0.5,
                 radius: (magnitude*50000)
-            }).bindPopup(`<h3>Location : [${latitude} ,  ${longitude}]</h3><hr> 
+            }).bindPopup(`<h3>${title}</h3><hr>
+            <p>Date: ${date}</p><hr>
+            <p>Location : [${latitude} ,  ${longitude}]</p><hr> 
             <p>Magnitude : ${magnitude}</p><hr>
-            <p>Depth: ${depth}</p>`).addTo(map);
+            <p>Depth: ${depth}</p><hr>`).addTo(map);
         }
         else if (depth < 90) {
             depthRange = "70-90",
@@ -92,9 +122,11 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geo
                 color: "#FF3300",
                 fillOpacity : 0.5,
                 radius: (magnitude*50000)
-            }).bindPopup(`<h3>Location : [${latitude} ,  ${longitude}]</h3><hr> 
+            }).bindPopup(`<h3>${title}</h3><hr>
+            <p>Date: ${date}</p><hr>
+            <p>Location : [${latitude} ,  ${longitude}]</p><hr> 
             <p>Magnitude : ${magnitude}</p><hr>
-            <p>Depth: ${depth}</p>`).addTo(map);
+            <p>Depth: ${depth}</p><hr>`).addTo(map);
         }
         else if (depth > 90) {
             depthRange = "90+",
@@ -102,74 +134,12 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geo
             color: "#990000",
             fillOpacity : 0.5,
             radius: (magnitude*50000)
-            }).bindPopup(`<h3>Location : [${latitude} ,  ${longitude}]</h3><hr> 
+            }).bindPopup(`<h3>${title}</h3><hr>
+            <p>Date: ${date}</p><hr>
+            <p>Location : [${latitude} ,  ${longitude}]</p><hr> 
             <p>Magnitude : ${magnitude}</p><hr>
-            <p>Depth: ${depth}</p>`).addTo(map);
+            <p>Depth: ${depth}</p><hr>`).addTo(map);
         }
     };
         
 });
-
-// function createFeatures(earthquakeData) {
-//     function onEachFeature(feature, layer) {
-//         let myIcon = L.icon({
-//             iconSize: [feature.properties.mag],
-//             //markerColor: feature.geometry.coordinates[2]
-//         })
-//         layer.bindPopup(`<h3>Location : [${feature.geometry.coordinates[1]} ,  ${feature.geometry.coordinates[0]}]</h3><hr>
-//         <p>Date: ${new Date(feature.properties.time)}</p><hr>
-//         <p>Magnitude : ${feature.properties.mag}</p><hr>
-//         <p>Depth: ${feature.geometry.coordinates[2]}</p>`);
-//     }
-
-    // let earthquakes = L.geoJSON(earthquakeData), {
-//         onEachFeature: onEachFeature
-//     });
-
-//     //send earthquakes layer to createMap functions
-//     createMap(earthquakes);
-// }
-//Creating variable to store URL for API call
-// let queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geojson"
-
-// //GET request to query URL
-// let earthquakeData = d3.json(queryUrl)//.then(function (data) {
-//     //createFeatures(data.features);
-// //});
-
-// let earthquakes = L.geoJSON(earthquakeData)
-// //Base Layers.
-// let streetmap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-//     });
-    
-//Create baseMaps object
-// let baseMaps = {
-//     "Street Map": street
-// };
-
-//Create earthquakes overlay
-// let overlayMaps = {
-//     Earthquakes : earthquakes
-// };
-
-// Create map with layers
-
-
-//Create layer control
-// L.control.layers(baseMaps, overlayMaps, {
-//     collapsed: true
-// }).addTo(myMap);
-
-
-
-// let info = L.control({
-//     position: "bottomright"
-// })
-// info.onAdd = function() {
-//     let div = L.DomUtil.create("div","legend");
-//     return div;
-// };
-
-// info.addTo(myMap)
-
